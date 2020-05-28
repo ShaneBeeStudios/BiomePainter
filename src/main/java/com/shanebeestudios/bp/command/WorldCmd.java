@@ -32,7 +32,7 @@ public class WorldCmd extends BaseCmd {
     @Override
     boolean onCommand(CommandSender sender, String[] args) {
         if (args.length > 0) {
-            switch (args[0]) {
+            switch (args[0].toLowerCase()) {
                 case "create":
                     //create world
                     // world create NAME ENV TYPE FILE SCALE
