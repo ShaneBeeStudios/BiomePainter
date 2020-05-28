@@ -1,0 +1,11 @@
+name: BiomePainter
+main: com.shanebeestudios.bp.BiomePainter
+version: '${project.version}'
+author: ShaneBee
+api-version: '1.15'
+softdepend:
+  - WorldGeneratorApi
+
+commands:
+  world:
+    description: Create a new world
