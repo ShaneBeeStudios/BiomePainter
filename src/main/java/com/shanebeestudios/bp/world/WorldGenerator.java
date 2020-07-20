@@ -53,7 +53,7 @@ public class WorldGenerator implements Listener, ConfigurationSerializable {
                 .name(name)
                 .environment(environment)
                 .type(worldType)
-                .generateStructures(false)
+                .generateStructures(true)
                 .createWorld();
         assert world != null;
         world.setSpawnLocation(getCenter());
@@ -64,7 +64,7 @@ public class WorldGenerator implements Listener, ConfigurationSerializable {
                 .name(name)
                 .environment(environment)
                 .type(worldType)
-                .generateStructures(false)
+                .generateStructures(true)
                 .createWorld();
     }
 
@@ -76,7 +76,7 @@ public class WorldGenerator implements Listener, ConfigurationSerializable {
         }
         if (world.getName().equalsIgnoreCase(name)) {
             nl.rutgerkok.worldgeneratorapi.WorldGenerator worldGenerator = event.getWorldGenerator();
-            worldGenerator.setBiomeGenerator(new BiomeGenerator(imageRender));
+            worldGenerator.setBiomeGenerator(new BiomeGenerator(imageRender, world.getEnvironment()));
         }
     }
 

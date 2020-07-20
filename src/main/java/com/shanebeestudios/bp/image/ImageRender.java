@@ -2,6 +2,7 @@ package com.shanebeestudios.bp.image;
 
 import com.shanebeestudios.bp.BiomePainter;
 import com.shanebeestudios.bp.biome.BiomeMap;
+import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 
 import javax.imageio.ImageIO;
@@ -121,11 +122,20 @@ public class ImageRender {
      *
      * @param x X position on the image
      * @param y Y position on the image
+     * @param environment Environment of the world (used to grab the default biome for this environment)
      * @return A Biome based on the color of the pixel of the image
-     * <br><b>NOTE:</b> If a biome does not match, {@link Biome#OCEAN} will return.
+     * <br><b>NOTE:</b> If a biome does not match, the default biome will return based on
+     * the environment.
      */
-    public Biome getBiome(int x, int y) {
-        return getBiome(x, y, Biome.PLAINS);
+    public Biome getBiome(int x, int y, Environment environment) {
+        switch (environment) {
+            case NETHER:
+                return getBiome(x, y, Biome.NETHER_WASTES);
+            case THE_END:
+                return getBiome(x, y, Biome.THE_END);
+            default:
+                return getBiome(x, y, Biome.PLAINS);
+        }
     }
 
 }
