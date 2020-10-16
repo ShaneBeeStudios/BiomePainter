@@ -20,10 +20,12 @@ public class WorldConfig {
     private final BiomePainter plugin;
     private File file;
     private FileConfiguration config;
+    private final WorldLoader worldLoader;
 
     public WorldConfig(BiomePainter plugin) {
         this.plugin = plugin;
         loadConfigFile();
+        this.worldLoader = new WorldLoader(config);
         loadWorlds();
     }
 
@@ -58,21 +60,16 @@ public class WorldConfig {
         }
 
         for (String key : keys) {
-            Object object = config.get("worlds." + key);
-            if (object instanceof WorldGenerator) {
-                WorldGenerator worldGenerator = ((WorldGenerator) object);
-                worldGenerator.loadWorld();
+            if (worldLoader.loadWorld(key)) {
                 Util.log("&aSuccessfully loaded world: &b" + key);
             } else {
                 Util.log("&cUnable to load world: &b" + key);
             }
         }
-
-
     }
 
-    public boolean saveWorld(WorldGenerator worldGenerator) {
-        config.set("worlds." + worldGenerator.getName(), worldGenerator);
+    public boolean saveWorld(WorldBuilder worldBuilder) {
+        worldLoader.saveWorld(worldBuilder);
         return save();
     }
 
@@ -84,6 +81,5 @@ public class WorldConfig {
             return false;
         }
     }
-
 
 }

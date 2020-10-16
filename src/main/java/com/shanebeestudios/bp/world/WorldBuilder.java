@@ -3,7 +3,7 @@ package com.shanebeestudios.bp.world;
 import com.shanebeestudios.bp.BiomePainter;
 import com.shanebeestudios.bp.biome.BiomeGenerator;
 import com.shanebeestudios.bp.image.ImageRender;
-import com.shanebeestudios.bp.util.WorldUtil;
+import nl.rutgerkok.worldgeneratorapi.WorldGenerator;
 import nl.rutgerkok.worldgeneratorapi.event.WorldGeneratorInitEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,26 +11,22 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @SuppressWarnings("unused")
-public class WorldGenerator implements Listener, ConfigurationSerializable {
+public class WorldBuilder implements Listener {
 
-    private final String name;
+    private String name;
     private World world;
-    private final Environment environment;
-    private final WorldType worldType;
-    private final ImageRender imageRender;
-    private final int scale;
+    private Environment environment;
+    private WorldType worldType;
+    private long seed;
+    private ImageRender imageRender;
+    private int scale;
     private boolean spawnMemory;
 
-    public WorldGenerator(String name, Environment environment, WorldType worldType, ImageRender imageRender, int scale) {
+    public WorldBuilder(String name, Environment environment, WorldType worldType, ImageRender imageRender, int scale) {
         ImageRender imageRender1;
         this.name = name;
         imageRender1 = imageRender;
@@ -47,8 +43,10 @@ public class WorldGenerator implements Listener, ConfigurationSerializable {
         this.scale = scale;
     }
 
+    public WorldBuilder() {
+    }
+
     public void createWorld() {
-        spawnMemory = false;
         this.world = WorldCreator
                 .name(name)
                 .environment(environment)
@@ -56,7 +54,8 @@ public class WorldGenerator implements Listener, ConfigurationSerializable {
                 .generateStructures(true)
                 .createWorld();
         assert world != null;
-        world.setSpawnLocation(getCenter());
+        this.world.setSpawnLocation(getCenter());
+        this.world.setKeepSpawnInMemory(spawnMemory);
     }
 
     public void loadWorld() {
@@ -64,18 +63,18 @@ public class WorldGenerator implements Listener, ConfigurationSerializable {
                 .name(name)
                 .environment(environment)
                 .type(worldType)
+                .seed(seed)
                 .generateStructures(true)
                 .createWorld();
+        assert this.world != null;
+        this.world.setKeepSpawnInMemory(spawnMemory);
     }
 
     @EventHandler
     public void onWorldLoad(WorldGeneratorInitEvent event) {
         World world = event.getWorld();
-        if (!spawnMemory) {
-            world.setKeepSpawnInMemory(false);
-        }
         if (world.getName().equalsIgnoreCase(name)) {
-            nl.rutgerkok.worldgeneratorapi.WorldGenerator worldGenerator = event.getWorldGenerator();
+            WorldGenerator worldGenerator = event.getWorldGenerator();
             worldGenerator.setBiomeGenerator(new BiomeGenerator(imageRender, world.getEnvironment()));
         }
     }
@@ -116,30 +115,47 @@ public class WorldGenerator implements Listener, ConfigurationSerializable {
         return world != null;
     }
 
-    @Override
-    public @NotNull Map<String, Object> serialize() {
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("name", name);
-        result.put("environment", environment.toString());
-        result.put("type", worldType.getName());
-        result.put("image", imageRender != null ? imageRender.getFileName() : "none");
-        result.put("scale", scale);
-
-        return result;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public static WorldGenerator deserialize(Map<String, Object> args) {
-        String name = (String) args.get("name");
-        Environment environment = WorldUtil.getEnvironment((String) args.get("environment"));
-        WorldType worldType = WorldUtil.getWorldType((String) args.get("type"));
-        String image = (String) args.get("image");
-        ImageRender imageRender = null;
-        int scale = ((int) args.get("scale"));
-        if (!image.equalsIgnoreCase("none")) {
-            imageRender = new ImageRender(image, scale);
-        }
-
-        return new WorldGenerator(name, environment, worldType, imageRender, scale);
+    public void setWorld(World world) {
+        this.world = world;
     }
 
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
+
+    public WorldType getWorldType() {
+        return worldType;
+    }
+
+    public void setWorldType(WorldType worldType) {
+        this.worldType = worldType;
+    }
+
+    public long getSeed() {
+        return seed;
+    }
+
+    public void setSeed(long seed) {
+        this.seed = seed;
+    }
+
+    public void setImageRender(ImageRender imageRender) {
+        this.imageRender = imageRender;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
+    }
+
+    public boolean isSpawnMemory() {
+        return spawnMemory;
+    }
+
+    public void setSpawnMemory(boolean spawnMemory) {
+        this.spawnMemory = spawnMemory;
+    }
 }

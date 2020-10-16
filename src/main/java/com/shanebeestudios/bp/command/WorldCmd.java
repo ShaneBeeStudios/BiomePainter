@@ -5,7 +5,7 @@ import com.shanebeestudios.bp.image.ImageRender;
 import com.shanebeestudios.bp.util.Util;
 import com.shanebeestudios.bp.util.WorldUtil;
 import com.shanebeestudios.bp.world.WorldConfig;
-import com.shanebeestudios.bp.world.WorldGenerator;
+import com.shanebeestudios.bp.world.WorldBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
@@ -145,10 +145,10 @@ public class WorldCmd extends BaseCmd {
             Util.sendMsg(sender, "&aSuccessfully &7generated biome map.");
         }
         Util.sendMsg(sender, "Generating world: &b" + worldName);
-        WorldGenerator worldGenerator = new WorldGenerator(worldName, environment, worldType,imageRender, scale);
-        worldGenerator.createWorld();
-        if (worldGenerator.isValid()) {
-            return worldConfig.saveWorld(worldGenerator);
+        WorldBuilder worldBuilder = new WorldBuilder(worldName, environment, worldType,imageRender, scale);
+        worldBuilder.createWorld();
+        if (worldBuilder.isValid()) {
+            return worldConfig.saveWorld(worldBuilder);
         }
         return false;
     }
